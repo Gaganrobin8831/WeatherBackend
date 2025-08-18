@@ -1,5 +1,7 @@
 import { createToken } from "../Middleware/Token.Middleware.js";
 import User from "../Models/user.Models.js";
+import bcrypt from 'bcrypt';
+
 
 export const Register = async (req,res) => {
     const { userName, email, password } = req.body;
@@ -8,10 +10,14 @@ export const Register = async (req,res) => {
         if (check) {
             return res.status(400).json({ message: "User already exists" });
         }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        if (!hashedPassword) {
+            return res.status(500).json({ message: "Error hashing password" });
+        }
         const newUser = new User({
             userName,
             email,
-            password
+            password:hashedPassword
         });
         await newUser.save();
         return res.status(201).json({ message: "User registered successfully" });
@@ -29,7 +35,7 @@ export const Login = async (req,res) => {
         if (!user) {
             return res.status(400).json({ message: "User not found" });
         }
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }   
