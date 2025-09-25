@@ -3,9 +3,17 @@ dotenv.config();
 import express from 'express';
 import { connectToDatabase } from './DB/database.Db.js';
 import userRouter from './Routes/user.Routes.js';
-
+import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+
+app.use(cors({
+  origin: '*', // Change this to your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
+}));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

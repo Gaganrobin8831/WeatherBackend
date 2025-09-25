@@ -4,7 +4,8 @@ import bcrypt from 'bcrypt';
 
 
 export const Register = async (req,res) => {
-    const { userName, email, password } = req.body;
+    const { username, email, password } = req.body;
+    // console.log(req.body);
     try {
         const check = await User.findOne({email})
         if (check) {
@@ -15,7 +16,7 @@ export const Register = async (req,res) => {
             return res.status(500).json({ message: "Error hashing password" });
         }
         const newUser = new User({
-            userName,
+            userName:username,
             email,
             password:hashedPassword
         });
@@ -40,7 +41,10 @@ export const Login = async (req,res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }   
         const token = createToken(user);
+        // console.log({ token, id: user._id, email: user.email });
+        
         return res.status(200).json({ token, id: user._id, email: user.email });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "Internal Server Error" });
